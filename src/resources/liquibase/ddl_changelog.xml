@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+	
+	
+	<changeSet id="1.2" author="tgupta" runOnChange="false">
+		<preConditions onFail="MARK_RAN" onFailMessage="ref_modsub ALREADY CREATED">
+			<not>
+				<tableExists tableName="ref_modsub" />
+			</not>
+		</preConditions>
+		<comment>Creating the table ref_modsub</comment>
+		<sql>
+			CREATE TABLE ref_modsub
+			(
+			  modsubid bigint NOT NULL,
+			  "version" integer NOT NULL DEFAULT 0,
+			  userid character varying(50) NOT NULL,
+			  username character varying(50) NOT NULL,
+			  createddate timestamp with time zone NOT NULL DEFAULT now(),
+			  lastupdateddate timestamp with time zone ,
+			  createdby bigint NOT NULL,
+			  lastupdatedby bigint,
+			  CONSTRAINT users_pkey PRIMARY KEY (modsubid)
+			)
+			WITH (
+			  OIDS=FALSE
+			);
+			ALTER TABLE ref_modsub OWNER TO postgres;
+			GRANT ALL ON TABLE ref_modsub TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE ref_modsub TO app;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="tgupta" id="1.3" runOnChange="false">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sequenceExists sequenceName="modsub_seq" />
+			</not>
+		</preConditions>
+		<comment>creating Sequence for modsub_seq table</comment>
+		<sql>
+			CREATE SEQUENCE modsub_seq
+			INCREMENT 1
+			MINVALUE 1
+			MAXVALUE 9223372036854775807
+			START 1
+			CACHE 1;
+			ALTER TABLE modsub_seq OWNER TO admin;
+			GRANT ALL ON TABLE modsub_seq TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE modsub_seq TO app;
+		</sql>
+	</changeSet>
+	
+	
+	<changeSet id="2.1" author="tgupta" runOnChange="false">
+		<preConditions onFail="MARK_RAN" onFailMessage="ref_role ALREADY CREATED">
+			<not>
+				<tableExists tableName="ref_role" />
+			</not>
+		</preConditions>
+		<comment>Creating the table ref_role</comment>
+		<sql>
+			create table ref_role
+			(
+			roleid bigint NOT NULL,
+			"version" integer NOT NULL DEFAULT 0,
+			created_date timestamp with time zone NOT NULL DEFAULT now(),
+			lastupdateddate timestamp with time zone,
+			deleted integer NOT NULL DEFAULT 0,
+			type character varying(255),
+			description character varying(255),
+			CONSTRAINT ref_role_pk PRIMARY KEY (roleid),
+			CONSTRAINT ref_role_unique UNIQUE(type)
+			)
+			WITH (
+			OIDS=FALSE
+			);
+			ALTER TABLE ref_role OWNER TO admin;
+			GRANT ALL ON TABLE ref_role TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE ref_role TO app;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="tgupta" id="2.2" runOnChange="false">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sequenceExists sequenceName="role_seq" />
+			</not>
+		</preConditions>
+		<comment>creating Sequence for role_seq table</comment>
+		<sql>
+			CREATE SEQUENCE role_seq
+			INCREMENT 1
+			MINVALUE 1
+			MAXVALUE 9223372036854775807
+			START 1
+			CACHE 1;
+			ALTER TABLE role_seq OWNER TO admin;
+			GRANT ALL ON TABLE role_seq TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE role_seq TO app;
+
+		</sql>
+	</changeSet>
+
+	 <changeSet id="2.3" author="tgupta" runOnChange="false">
+		<preConditions onFail="MARK_RAN" onFailMessage="ref_user ALREADY CREATED">
+			<not>
+				<tableExists tableName="ref_user" />
+			</not>
+		</preConditions>
+		<comment>Creating the table ref_user</comment>
+		<sql>
+			CREATE TABLE ref_user
+			(
+			  userid bigint NOT NULL,
+			  version integer NOT NULL,
+			  createdby bigint,
+			  createddate timestamp with time zone NOT NULL DEFAULT now(),
+			  lastupdateddate timestamp with time zone,
+			  lastupdatedby bigint,
+			  active boolean NOT NULL DEFAULT true,
+			  username character varying(60) NOT NULL,
+			  password character varying(255) NOT NULL, 
+			  deleted integer NOT NULL DEFAULT 0,
+			  CONSTRAINT fs_user_pkey PRIMARY KEY (userid),  
+			  CONSTRAINT fk_user_userid_createdby FOREIGN KEY (createdby)
+			      REFERENCES ref_user (userid) MATCH SIMPLE
+			      ON UPDATE NO ACTION ON DELETE NO ACTION,
+			  CONSTRAINT fk_user_userid_updatedby FOREIGN KEY (lastupdatedby)
+			      REFERENCES ref_user (userid) MATCH SIMPLE
+			      ON UPDATE NO ACTION ON DELETE NO ACTION,
+			  CONSTRAINT fs_user_username_key UNIQUE (username)
+			)
+			WITH (
+			  OIDS=TRUE
+			);
+			ALTER TABLE ref_user OWNER TO postgres;
+			GRANT ALL ON TABLE ref_user TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE ref_user TO app;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="tgupta" id="2.4" runOnChange="false">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sequenceExists sequenceName="user_seq" />
+			</not>
+		</preConditions>
+		<comment>creating Sequence for user_seq table</comment>
+		<sql>
+			CREATE SEQUENCE user_seq
+			INCREMENT 1
+			MINVALUE 1
+			MAXVALUE 9223372036854775807
+			START 1
+			CACHE 1;
+			ALTER TABLE user_seq
+			OWNER TO admin;
+			ALTER TABLE user_seq OWNER TO admin;
+			GRANT ALL ON TABLE user_seq TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE user_seq TO app;
+
+		</sql>
+	</changeSet>
+
+	<changeSet id="2.5" author="tgupta" runOnChange="false">
+		<preConditions onFail="MARK_RAN" onFailMessage="fs_user_role ALREADY CREATED">
+			<not>
+				<tableExists tableName="fs_user_role" />
+			</not>
+		</preConditions>
+		<comment>Creating the table fs_user_role</comment>
+		<sql>
+			CREATE TABLE fs_user_role
+			(
+			  userid bigint NOT NULL,
+			  roleid bigint NOT NULL,
+			  CONSTRAINT fs_user_role_pkey PRIMARY KEY (userid, roleid),
+			  CONSTRAINT fk_role_roleid FOREIGN KEY (roleid)
+			      REFERENCES ref_role (roleid) MATCH SIMPLE
+			      ON UPDATE NO ACTION ON DELETE NO ACTION,
+			  CONSTRAINT fkaf011f785e7b21da FOREIGN KEY (userid)
+			      REFERENCES ref_user (userid) MATCH SIMPLE
+			      ON UPDATE NO ACTION ON DELETE NO ACTION
+			)
+			WITH (
+			  OIDS=TRUE
+			);
+			ALTER TABLE fs_user_role OWNER TO postgres;
+
+		</sql>
+	</changeSet>
+	
+	<changeSet id="2.6" author="tgupta" runOnChange="false">
+		<preConditions onFail="MARK_RAN" onFailMessage="ref_constant ALREADY CREATED">
+			<not>
+				<tableExists tableName="ref_constant" />
+			</not>
+		</preConditions>
+		<comment>Creating the table ref_constant</comment>
+		<sql>
+			create table ref_constant
+			(
+				constantid bigint NOT NULL,
+				"version" integer NOT NULL DEFAULT 0,
+				createddate timestamp with time zone NOT NULL DEFAULT now(),
+				lastupdateddate timestamp with time zone ,
+				createdby bigint NOT NULL,
+				lastupdatedby bigint,
+				code character varying(255) NOT NULL,
+				value character varying(255),
+				deleted integer NOT NULL DEFAULT 0,
+				type character varying(255),
+				CONSTRAINT ref_constant_pk PRIMARY KEY (constantid)
+			)
+			WITH (
+			OIDS=FALSE
+			);
+			ALTER TABLE ref_constant OWNER TO postgres;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="tgupta" id="2.7" runOnChange="false">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sequenceExists sequenceName="constant_seq" />
+			</not>
+		</preConditions>
+		<comment>creating Sequence for constant_seq table</comment>
+		<sql>
+			CREATE SEQUENCE constant_seq
+			INCREMENT 1
+			MINVALUE 1
+			MAXVALUE 9223372036854775807
+			START 1
+			CACHE 1;
+			ALTER TABLE constant_seq OWNER TO postgres;
+		</sql>
+	</changeSet>
+
+	<changeSet id="20.1" author="tgupta" runOnChange="false">
+		<preConditions onFail="MARK_RAN" onFailMessage="batch_job_instance ALREADY CREATED">
+			<not>
+				<tableExists tableName="batch_job_instance" />
+			</not>
+		</preConditions>
+		<comment>Creating the table batch_job_instance</comment>
+		<sql>
+			CREATE TABLE batch_job_instance
+			(
+			  job_instance_id bigint NOT NULL,
+			  "version" bigint,
+			  job_name character varying(100) NOT NULL,
+			  job_key character varying(2500),
+			  CONSTRAINT batch_job_instance_pkey PRIMARY KEY (job_instance_id)
+			)
+			WITH (
+			  OIDS=FALSE
+			);
+			ALTER TABLE batch_job_instance OWNER TO admin;
+			ALTER TABLE batch_job_instance OWNER TO admin;
+			GRANT ALL ON TABLE batch_job_instance TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE batch_job_instance TO app;
+		</sql>
+	</changeSet>
+	<changeSet author="tgupta" id="20.2" runOnChange="false">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sequenceExists sequenceName="batch_job_seq" />
+			</not>
+		</preConditions>
+		<comment>creating Sequence for batch_job_seq table</comment>
+		<sql>
+			CREATE SEQUENCE batch_job_seq
+			  INCREMENT 1
+			  MINVALUE 1
+			  MAXVALUE 9223372036854775807
+			  START 15
+			  CACHE 1;
+			ALTER TABLE batch_job_seq OWNER TO admin;
+			ALTER TABLE batch_job_seq OWNER TO admin;
+			GRANT ALL ON TABLE batch_job_seq TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE batch_job_seq TO app;
+		</sql>
+	</changeSet>
+	<changeSet id="20.3" author="tgupta" runOnChange="false">
+		<preConditions onFail="MARK_RAN" onFailMessage="batch_job_params ALREADY CREATED">
+			<not>
+				<tableExists tableName="batch_job_params" />
+			</not>
+		</preConditions>
+		<comment>Creating the table batch_job_params</comment>
+		<sql>
+			CREATE TABLE batch_job_params
+			(
+			  job_instance_id bigint NOT NULL,
+			  type_cd character varying(6) NOT NULL,
+			  key_name character varying(100) NOT NULL,
+			  string_val character varying(250),
+			  date_val timestamp without time zone,
+			  long_val bigint,
+			  double_val double precision,
+			  CONSTRAINT job_instance_params_fk FOREIGN KEY (job_instance_id)
+			      REFERENCES batch_job_instance (job_instance_id) MATCH SIMPLE
+			      ON UPDATE NO ACTION ON DELETE NO ACTION
+			)
+			WITH (
+			  OIDS=FALSE
+			);
+			ALTER TABLE batch_job_params OWNER TO admin;
+			ALTER TABLE batch_job_params OWNER TO admin;
+			GRANT ALL ON TABLE batch_job_params TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE batch_job_params TO app;
+		</sql>
+	</changeSet>
+	<changeSet id="20.4" author="tgupta" runOnChange="false">
+		<preConditions onFail="MARK_RAN" onFailMessage="batch_job_execution ALREADY CREATED">
+			<not>
+				<tableExists tableName="batch_job_execution" />
+			</not>
+		</preConditions>
+		<comment>Creating the table batch_job_execution</comment>
+		<sql>
+			CREATE TABLE batch_job_execution
+			(
+			  job_execution_id bigint NOT NULL,
+			  "version" bigint,
+			  job_instance_id bigint NOT NULL,
+			  create_time timestamp without time zone NOT NULL,
+			  start_time timestamp without time zone,
+			  end_time timestamp without time zone,
+			  status character varying(10),
+			  exit_code character varying(20),
+			  exit_message character varying(2500),
+			  last_updated timestamp without time zone,
+			  CONSTRAINT batch_job_execution_pkey PRIMARY KEY (job_execution_id),
+			  CONSTRAINT job_instance_execution_fk FOREIGN KEY (job_instance_id)
+			      REFERENCES batch_job_instance (job_instance_id) MATCH SIMPLE
+			      ON UPDATE NO ACTION ON DELETE NO ACTION
+			)
+			WITH (
+			  OIDS=FALSE
+			);
+			ALTER TABLE batch_job_execution OWNER TO admin;
+			ALTER TABLE batch_job_execution OWNER TO admin;
+			GRANT ALL ON TABLE batch_job_execution TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE batch_job_execution TO app;
+		</sql>
+	</changeSet>
+	<changeSet author="tgupta" id="20.5" runOnChange="false">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sequenceExists sequenceName="batch_job_execution_seq" />
+			</not>
+		</preConditions>
+		<comment>creating Sequence for batch_job_execution_seq table</comment>
+		<sql>
+			CREATE SEQUENCE batch_job_execution_seq
+			  INCREMENT 1
+			  MINVALUE 1
+			  MAXVALUE 9223372036854775807
+			  START 15
+			  CACHE 1;
+			ALTER TABLE batch_job_execution_seq OWNER TO admin;
+			ALTER TABLE batch_job_execution_seq OWNER TO admin;
+			GRANT ALL ON TABLE batch_job_execution_seq TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE batch_job_execution_seq TO app;
+		</sql>
+	</changeSet>
+	<changeSet id="20.6" author="tgupta" runOnChange="false">
+		<preConditions onFail="MARK_RAN" onFailMessage="batch_job_execution_context ALREADY CREATED">
+			<not>
+				<tableExists tableName="batch_job_execution_context" />
+			</not>
+		</preConditions>
+		<comment>Creating the table batch_job_execution</comment>
+		<sql>
+			CREATE TABLE batch_job_execution_context
+			(
+			  job_execution_id bigint NOT NULL,
+			  short_context character varying(2500) NOT NULL,
+			  serialized_context text,
+			  CONSTRAINT batch_job_execution_context_pkey PRIMARY KEY (job_execution_id),
+			  CONSTRAINT job_exec_ctx_fk FOREIGN KEY (job_execution_id)
+			      REFERENCES batch_job_execution (job_execution_id) MATCH SIMPLE
+			      ON UPDATE NO ACTION ON DELETE NO ACTION
+			)
+			WITH (
+			  OIDS=FALSE
+			);
+			ALTER TABLE batch_job_execution_context OWNER TO admin;
+			ALTER TABLE batch_job_execution_context OWNER TO admin;
+			GRANT ALL ON TABLE batch_job_execution_context TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE batch_job_execution_context TO app;
+		</sql>
+	</changeSet>
+	<changeSet id="20.7" author="tgupta" runOnChange="false">
+		<preConditions onFail="MARK_RAN" onFailMessage="batch_step_execution ALREADY CREATED">
+			<not>
+				<tableExists tableName="batch_step_execution" />
+			</not>
+		</preConditions>
+		<comment>Creating the table batch_step_execution</comment>
+		<sql>
+			CREATE TABLE batch_step_execution
+			(
+			  step_execution_id bigint NOT NULL,
+			  "version" bigint NOT NULL,
+			  step_name character varying(100) NOT NULL,
+			  job_execution_id bigint NOT NULL,
+			  start_time timestamp without time zone NOT NULL,
+			  end_time timestamp without time zone,
+			  status character varying(10),
+			  commit_count bigint,
+			  read_count bigint,
+			  filter_count bigint,
+			  write_count bigint,
+			  read_skip_count bigint,
+			  write_skip_count bigint,
+			  process_skip_count bigint,
+			  rollback_count bigint,
+			  exit_code character varying(20),
+			  exit_message character varying(2500),
+			  last_updated timestamp without time zone,
+			  CONSTRAINT batch_step_execution_pkey PRIMARY KEY (step_execution_id),
+			  CONSTRAINT job_execution_step_fk FOREIGN KEY (job_execution_id)
+			      REFERENCES batch_job_execution (job_execution_id) MATCH SIMPLE
+			      ON UPDATE NO ACTION ON DELETE NO ACTION
+			)
+			WITH (
+			  OIDS=FALSE
+			);
+			ALTER TABLE batch_step_execution OWNER TO admin;
+			ALTER TABLE batch_step_execution OWNER TO admin;
+			GRANT ALL ON TABLE batch_step_execution TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE batch_step_execution TO app;
+		</sql>
+	</changeSet>
+	<changeSet author="tgupta" id="20.9" runOnChange="false">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sequenceExists sequenceName="batch_step_execution_seq" />
+			</not>
+		</preConditions>
+		<comment>creating Sequence for batch_step_execution_seq table</comment>
+		<sql>
+			CREATE SEQUENCE batch_step_execution_seq
+			  INCREMENT 1
+			  MINVALUE 1
+			  MAXVALUE 9223372036854775807
+			  START 15
+			  CACHE 1;
+			ALTER TABLE batch_step_execution_seq OWNER TO admin;
+			ALTER TABLE batch_step_execution_seq OWNER TO admin;
+			GRANT ALL ON TABLE batch_step_execution_seq TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE batch_step_execution_seq TO app;
+		</sql>
+	</changeSet>
+	<changeSet id="20.10" author="tgupta" runOnChange="false">
+		<preConditions onFail="MARK_RAN" onFailMessage="batch_step_execution_context ALREADY CREATED">
+			<not>
+				<tableExists tableName="batch_step_execution_context" />
+			</not>
+		</preConditions>
+		<comment>Creating the table batch_step_execution_context</comment>
+		<sql>
+			CREATE TABLE batch_step_execution_context
+			(
+			  step_execution_id bigint NOT NULL,
+			  short_context character varying(2500) NOT NULL,
+			  serialized_context text,
+			  CONSTRAINT batch_step_execution_context_pkey PRIMARY KEY (step_execution_id),
+			  CONSTRAINT step_exec_ctx_fk FOREIGN KEY (step_execution_id)
+			      REFERENCES batch_step_execution (step_execution_id) MATCH SIMPLE
+			      ON UPDATE NO ACTION ON DELETE NO ACTION
+			)
+			WITH (
+			  OIDS=FALSE
+			);
+			ALTER TABLE batch_step_execution_context OWNER TO admin;
+			ALTER TABLE batch_step_execution_context OWNER TO admin;
+			GRANT ALL ON TABLE batch_step_execution_context TO admin;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE batch_step_execution_context TO app;
+		</sql>
+	</changeSet>
+</databaseChangeLog>	

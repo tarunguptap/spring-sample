@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<!-- ====================================================================== 
+     November 27, 2007
+
+         
+     Build script for running jobs
+                        
+     $Id: build.xml 2944 2007-10-29 16:42:51Z Tarun Gupta $                                                             
+     ====================================================================== -->
+<project name="Demo Jobs">
+	<import file="build.xml"/>
+    <description>
+            Build script for running Jobs
+    </description>  
+	<property name="db.changelog.file" value="${project.resources.liquibase.dir}/db_changelog.xml"/>
+	<property name="database.driver" value="${build.lib.dir}/postgresql-9.1-901.jdbc4.jar"/>
+	
+	<target name="update-database">
+		<input  message="Please specify DataBase URL  :" addproperty="databaseURL" defaultvalue="jdbc:postgresql://localhost:5432/batchdb"/>
+		<input  message="Please specify DataBase UserName  :" addproperty="username" defaultvalue="postgres"/>
+		<input  message="Please specify DataBase password  :" addproperty="password" defaultvalue="post@123"/>
+
+		<fail unless="db.changelog.file">db.changelog.file not set</fail>
+		<fail unless="databaseURL">database.url not set</fail>
+	    <fail unless="username">database.username not set</fail>
+	    <fail unless="password">database.password not set</fail>
+		
+		<taskdef resource="liquibasetasks.properties">
+	    	<classpath refid="lib.path" />
+			
+	    </taskdef>
+	 
+	    <updateDatabase
+	            changeLogFile="${db.changelog.file}"
+	            url="${databaseURL}"
+	            username="${username}"
+	            password="${password}"
+	            dropFirst="false"
+	    		classpathref="lib.path"/>
+	 
+	</target>
+	
+	<target name="userJob">  
+		<java classname="com.spring.batch.launcher.BatchJobLauncher" fork="true" classpathref="lib.path" maxmemory="1024m" failonerror="true">
+			<arg value="userJob"/>
+			<arg value="20"/>
+			<arg value="30"/>
+			<arg value="2014-01-08 00:00:00"/>
+			<arg value="2015-04-09 00:00:00"/>
+			<arg value="tgupta@qasource.com"/> 
+			<arg value="hylapod_receipt"/>
+			<arg value="verizon"/>
+			<!--jvmarg value="-Xdebug" />
+			<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5555" />
+			<arg value="${corePoolSize}"/>
+			<arg value="${maxPoolSize}"/>
+			<arg value="${startDate}"/>
+			<arg value="${endDate}"/>
+			<arg value="${emailID}"/>
+			<arg value="${vendor}"/>
+			<arg value="${siteName}"/-->
+		</java>
+	</target>
+	
+	<target name="userCSVJob">
+			<!--input message="Please specify the file"  addproperty="filePath"/>
+			<input message="Please specify the base url"  addproperty="baseURL" defaultvalue="http://localhost:8080"/>
+			<input message="Please specify the comma seperated email-IDs"  addproperty="emailIds"/>
+			<input message="Please specify Core Pool Size"  addproperty="corePoolSize" defaultvalue="20"/>
+			<input message="Please specify Max Pool Size"  addproperty="maxPoolSize" defaultvalue="20"/-->
+			<java classname="com.spring.batch.launcher.BatchJobLauncher" fork="true" classpathref="project.class.path" maxmemory="1024m">
+				<arg value="userCSVJob"/>
+				<!--arg value="${corePoolSize}"/>
+				<arg value="${maxPoolSize}"/>
+				<arg value="${filePath}"/>
+				<arg value="${emailIds}"/-->
+				<arg value="20"/>
+				<arg value="30"/>
+				<arg value="file:E:\\Test.csv"/>
+				<arg value="tgupta@qasource.com"/>
+				<!--jvmarg value="-Xdebug" />
+				<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5556" /-->
+			</java>
+		</target>
+</project>

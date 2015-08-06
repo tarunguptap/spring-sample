@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+	<changeSet author="tgupta" id="2.1" runOnChange="false">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from ref_role where
+				type =
+				'ROLE_API';
+			</sqlCheck>
+		</preConditions>
+		<comment>WAR-2713: creating ROLE_API for REST client</comment>
+		<sql>
+			insert into ref_role (roleid,version,type,description) values
+			(nextval('role_seq'),0,'ROLE_API','role_api');
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="tgupta" id="2.2" runOnChange="false"
+		context="devl,test">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from ref_user where
+				username = 'tgupta';
+			</sqlCheck>
+		</preConditions>
+		<comment>WAR-2713: insert user with password : Password1</comment>
+		<sql>
+			insert into ref_user (userid,version,username,password) values (9991,0,'tgupta','86475810ae8165b8dd6226b89c7d402ef6ed23e0');
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="tgupta" id="2.3" runOnChange="false">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from fs_user_role where userid = (select userid from ref_user where username = 'tgupta' and roleid = (select roleid from ref_role where
+				type='ROLE_API'));
+			</sqlCheck>
+		</preConditions>
+		<comment>WAR-2713: associated user with role_api</comment>
+		<sql>
+			insert into fs_user_role (userid,roleid) values ((select userid from ref_user where username = 'tgupta'),((select roleid from
+			ref_role where type = 'ROLE_API')));
+		</sql>
+	</changeSet>
+	
+	<changeSet author="tgupta" id="2.4" runOnChange="false">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from ref_role where
+				type =
+				'ROLE_ADMIN';
+			</sqlCheck>
+		</preConditions>
+		<comment>WAR-2713: creating ROLE_API for REST client</comment>
+		<sql>
+			insert into ref_role (roleid,version,type,description) values (nextval('role_seq'),0,'ROLE_ADMIN','role_admin');
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="tgupta" id="2.7" runOnChange="false">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from ref_user where
+				username = 'admin';
+			</sqlCheck>
+		</preConditions>
+		<comment>WAR-2713: insert user admin with password Password1</comment>
+		<sql>
+			insert into ref_user (userid,version,username,password) values (9992,0,'admin','270d014687333239a43b89c816bd2d3e48bed097');
+		</sql>
+	</changeSet>
+	<changeSet author="tgupta" id="2.8" runOnChange="false">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from fs_user_role where userid = (select userid from ref_user where username = 'admin') and roleid = (select roleid from ref_role where
+				type='ROLE_ADMIN');
+			</sqlCheck>
+		</preConditions>
+		<comment>WAR-2713: associated user with role_api</comment>
+		<sql>
+			insert into fs_user_role (userid,roleid) values ((select userid from ref_user where username = 'admin'),((select roleid from
+			ref_role where type = 'ROLE_ADMIN')));
+		</sql>
+	</changeSet>
+	<changeSet author="tgupta" id="2.9" runOnChange="false">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from fs_user_role where userid = (select userid from ref_user where username = 'admin') and roleid = (select roleid from ref_role where
+				type='ROLE_API');
+			</sqlCheck>
+		</preConditions>
+		<comment>WAR-2713: associated user with role_api</comment>
+		<sql>
+			insert into fs_user_role (userid,roleid) values ((select userid from ref_user where username = 'admin'),((select roleid from
+			ref_role where type = 'ROLE_API')));
+		</sql>
+	</changeSet>
+</databaseChangeLog>

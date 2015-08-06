@@ -1,0 +1,2 @@
+http://localhost:8090/spring-sample/welcome
+http://localhost:8090/spring-sample/login

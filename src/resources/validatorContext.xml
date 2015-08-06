@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<!--List of all the user validator in the order of there execution	-->
+	<bean id="userValidatorList" class="java.util.ArrayList">
+	    <constructor-arg>
+	        <list>
+	        	<ref bean="apiUserValidator" />
+	        	<ref bean="testUserValidator" /> 
+	            <ref bean="thirdPartyUserValidator" />   
+	        </list>
+	    </constructor-arg>
+	</bean>
+</beans>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context-2.5.xsd 
+			http://www.springframework.org/schema/batch 
+			http://www.springframework.org/schema/batch/spring-batch-2.1.xsd">
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="org.postgresql.Driver" /> 
+		<property name="url" value="jdbc:postgresql://localhost:5432/batchdb" /> 
+		<property name="username" value="postgres" /> 
+		<property name="password" value="post@123" />
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.batch.support.transaction.ResourcelessTransactionManager">
+	</bean>
+
+	<bean id="jobRepository"
+		class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="databaseType" value="POSTGRES"></property>
+	</bean>
+
+	<bean id="jobLauncher"
+		class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+  	
+  	<!-- User database read and write in csv Job starts here  -->
+  	
+  		 <bean id="jobTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor" scope="step">
+    		<property name="corePoolSize" value="#{jobParameters['2']}" />
+    		<property name="maxPoolSize" value="#{jobParameters['3']}"/>
+    		<property name="keepAliveSeconds" value="5" />
+		</bean>
+  	
+  		<bean id="userReader" class="com.spring.batch.job.subdao.UserReader" init-method="init" lazy-init="true" scope="step">
+ 	 		<property name="stepExecutionListener"> <ref bean="userExecutionListener" /> </property>
+ 		</bean>
+ 		
+ 		<bean id="userProcessor" class="com.spring.batch.job.subdao.UserProcessor" init-method="init" lazy-init="true" scope="step">
+ 			<property name="stepExecutionListener"> <ref bean="userExecutionListener" /> </property>
+ 		</bean>
+ 		
+ 		<bean id="userWriter" class="com.spring.batch.job.subdao.UserWriter" init-method="init"  lazy-init="true" scope="step">
+ 			<property name="stepExecutionListener"> <ref bean="userExecutionListener" /> </property>
+ 		</bean>
+  	
+  		<batch:job id="userJob" job-repository="jobRepository" xmlns="http://www.springframework.org/schema/batch">
+	 		<batch:step id="modelMappingStep" next="sendMailForUser">
+		 		<batch:tasklet task-executor="jobTaskExecutor">
+		 			<batch:chunk reader="userReader"  processor="userProcessor" writer="userWriter" commit-interval="1" />
+		 			<listeners>
+	   					<listener ref="userExecutionListener" />
+	  				 </listeners>
+		 		</batch:tasklet>
+	 		</batch:step>
+			<batch:step id="sendMailForUser">
+	    		<batch:tasklet  ref="userSendEMail" />
+	    	</batch:step>
+ 		</batch:job>
+  	
+  		<bean id="userSendEMail" class="com.spring.batch.job.subdao.UserSendEMail" scope="step" init-method="init" >
+  			<property name="stepExecutionListener"> <ref bean="userExecutionListener" /> </property>
+  		</bean>
+  	
+  		<bean id="userExecutionListener" class="com.spring.batch.job.subdao.UserExecutionListener"/>
+  		
+  	<!-- User database read and write in csv Job ends here  -->
+  	
+  	<!-- User csv read and write in database Job starts here  -->
+  	
+  	<batch:job id="userCSVJob" xmlns="http://www.springframework.org/schema/batch">
+          <batch:step id="readCSVFile" next="sendMail">
+            <batch:tasklet task-executor="jobTaskExecutor" >
+                <batch:chunk reader="userCSVReader" processor="userCSVProcess"  writer="userCSVWriter" commit-interval="1" />
+                 <listeners>
+   					<listener ref="userCSVExecutionListener" />
+  				 </listeners>
+            </batch:tasklet>
+         </batch:step>
+         <batch:step id="sendMail">
+    		<batch:tasklet  ref="userCSVSendMail" />
+    	</batch:step>
+   </batch:job>
+  
+   <bean id="userCSVExecutionListener" class="com.spring.batch.job.subdao.csvread.UserCSVExecutionListener"/>
+  
+   <bean id="userCSVReader"  class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+	  	<property name="linesToSkip" value="1" />
+	  	<property name="skippedLinesCallback" ref="userCSVHeader" />
+	  	<property name="resource" value="#{jobParameters['4']}" />
+
+  		<property name="lineMapper">
+   	   		<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+	    		<property name="lineTokenizer">
+	     			<bean class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+	      				<property name="names"  value="USERID,USERNAME" />
+	     			</bean>
+	    		</property>
+	    
+	    		<property name="fieldSetMapper">
+	     			<bean class="com.spring.batch.job.subdao.csvread.UserCSVFieldMapper" scope="step" init-method="init">
+	     				<property name="stepExecutionListener"> <ref bean="userCSVExecutionListener" /></property>
+	     			</bean>
+    			</property>
+    		
+   			</bean>
+  		</property>
+   </bean>
+   
+   <bean id="userCSVHeader" class="com.spring.batch.job.subdao.csvread.UserCSVFileHeader" scope="step" >
+  		<property name="stepExecutionListener"> <ref bean="userCSVExecutionListener" /> </property>
+   </bean>
+   
+   <bean id="userCSVProcess" class="com.spring.batch.job.subdao.csvread.UserCSVProcessor" scope="step" init-method="init">
+  		<property name="stepExecutionListener"> <ref bean="userCSVExecutionListener" /> </property>
+   </bean>
+   
+   <bean id="userCSVWriter" class="com.spring.batch.job.subdao.csvread.UserCSVWriter" scope='step' />
+   
+   <bean id="userCSVSendMail" class="com.spring.batch.job.subdao.csvread.UserCSVSendEmail" scope="step" init-method="init" >
+  		<property name="stepExecutionListener"> <ref bean="userCSVExecutionListener" /> </property>
+  	</bean>
+   
+  <!-- User csv read and write in database Job starts here  -->
+</beans>

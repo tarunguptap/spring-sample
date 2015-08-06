@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="spring-sample">
+    <property environment="env"/>
+    <property name="ECLIPSE_HOME" value="../../Installation/eclipse_juno_gradle_git_maven"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.7"/>
+    <property name="source" value="1.7"/>
+	<!-- Project Directories -->
+		<property name="project.base.dir" value="."/>
+		<property name="project.web.dir" value="${project.base.dir}/WebContent"/>
+		<property name="project.webinf.dir" value="${project.web.dir}/WEB-INF"/>
+		<property name="project.lib.dir" value="${project.webinf.dir}/lib" />
+		<property name="project.classes.dir" value="build/classes" />
+		<property name="project.src.dir" value="${project.base.dir}/src/java"/>
+		<property name="project.test.dir" value="${project.base.dir}/src/test"/>
+		<property name="project.resources.dir" value="${project.base.dir}/src/resources"/>
+		<property name="project.resources.liquibase.dir" value="${project.base.dir}/src/resources/liquibase"/>
+		
+		<property name="build.lib.dir" value="${project.web.dir}/lib"/>
+		
+		<path id="project.class.path">
+			<fileset dir="${project.lib.dir}">
+	            <include name="**/*.jar" />
+	        </fileset>
+			<pathelement location="${project.classes.dir}"/>
+		</path>
+		
+		<path id="lib.path">
+	        <fileset dir="${project.lib.dir}">
+	            <include name="**/*.jar" />
+	        </fileset>
+			<pathelement location="${project.classes.dir}"/>
+	    </path>
+	
+    <target name="init">
+        <mkdir dir="build/classes"/>
+        <copy includeemptydirs="false" todir="build/classes">
+            <fileset dir="src">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+	
+    <target name="clean">
+        <delete dir="build/classes"/>
+    </target>
+	
+    <target depends="clean,init" name="build">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="build/classes" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="lib.path"/>
+        </javac>
+    </target>
+	
+
+	<target name="war" description="Bundles the application as a WAR file" depends="clean, build">
+	    <mkdir dir="WebContent/WEB-INF/classes"/>
+	     
+	    <copy includeemptydirs="false" todir="WebContent/WEB-INF/classes">
+	            <fileset dir="build/classes">
+	            <include name="**/*.class"/>
+	            </fileset>
+	    </copy>
+	     
+	    <war destfile="ROOT.war"
+	        basedir="WebContent"
+	        needxmlfile="false">
+	    </war>
+	</target>
+</project>
