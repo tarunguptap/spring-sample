@@ -1,7 +1,7 @@
 antlr-2.7.6.jar
 aopalliance-1.0.jar
 asm-3.2.jar
-aspectjrt.jar
+aspectjrt1.7.3.jar
 aspectjtools-1.6.3.jar
 aspectjweaver-1.6.3.jar
 cglib-2.2.jar
@@ -15,7 +15,7 @@ commons-logging-1.1.jar
 commons-pool-1.5.6.jar
 dom4j-1.6.1.jar
 ejb3-persistence.jar
-hibernate.jar
+hibernate.3.3.2.jar
 hibernate-annotations.jar
 hibernate-commons-annotations.jar
 hsqldb.jar

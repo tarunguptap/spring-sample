@@ -40,6 +40,8 @@ public class User extends PersistentEntity {
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "fs_user_role", joinColumns = { @JoinColumn(name = "userid") }, inverseJoinColumns = { @JoinColumn(name = "roleid") })
 	private Set<Role> roles;
+	
+	private AuditInfo auditInfo = new AuditInfo();
 
 	/**
 	 * @param userName
@@ -116,5 +118,11 @@ public class User extends PersistentEntity {
 		this.roles = roles;
 	}
 
+	public AuditInfo getAuditInfo() {
+		return auditInfo;
+	}
 
+	public void setAuditInfo(AuditInfo auditInfo) {
+		this.auditInfo = auditInfo;
+	}
 }
