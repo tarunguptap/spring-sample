@@ -1,0 +1,20 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
+	
+	<int:channel id="inputChannel"/>
+	<int:channel id="outputChannel">
+		<int:queue capacity="10"/>
+	</int:channel>
+	<bean id="springIntHelloWorldExample"
+		class="com.spring.integration.SpringIntegrationHelloWorldExample">
+		<property name="inputChannel" ref="inputChannel" />
+	</bean>
+	<bean id="greeting" class="com.spring.integration.Greeting"/>
+	<int:service-activator input-channel="inputChannel" ref="greeting" output-channel="outputChannel"/>
+</beans>
+
