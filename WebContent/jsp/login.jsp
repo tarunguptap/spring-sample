@@ -52,6 +52,53 @@
 	       </form>
 	    </div>
 	 </div>
+	 
+	 <div class="row-fluid">
+		<div class="span12">
+			<ul class="thumbnails">
+				<li class="span3">
+					<div class="thumbnail" align="center">
+						<img class="img-rounded pull-xs-right" src="assets/images/25.jpg" alt="images/25.jpg" >
+					</div>
+				</li>
+				<li class="span3">
+					<div class="thumbnail" align="center">
+						<img class="img-rounded pull-xs-right" src="assets/images/25.jpg" alt="images/25.jpg" >
+					</div>
+				</li>
+				<li class="span3">
+					<div class="thumbnail" align="center">
+						<img class="img-rounded pull-xs-right" src="assets/images/25.jpg" alt="images/25.jpg" >
+					</div>
+				</li>
+				<li class="span3">
+					<div class="thumbnail" align="center">
+						<img class="img-rounded pull-xs-right" src="assets/images/25.jpg" alt="images/25.jpg" >
+					</div>
+				</li>
+				<li class="span3">
+					<div class="thumbnail" align="center">
+						<img class="img-rounded pull-xs-right" src="assets/images/25.jpg" alt="images/25.jpg" >
+					</div>
+				</li>
+				<li class="span3">
+					<div class="thumbnail" align="center">
+						<img class="img-rounded pull-xs-right" src="assets/images/25.jpg" alt="images/25.jpg" >
+					</div>
+				</li>
+				<li class="span3">
+					<div class="thumbnail" align="center">
+						<img class="img-rounded pull-xs-right" src="assets/images/25.jpg" alt="images/25.jpg" >
+					</div>
+				</li>
+				<li class="span3">
+					<div class="thumbnail" align="center">
+						<img class="img-rounded pull-xs-right" src="assets/images/25.jpg" alt="images/25.jpg" >
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
 </div>
 
 <script language="javascript" type="text/javascript">
