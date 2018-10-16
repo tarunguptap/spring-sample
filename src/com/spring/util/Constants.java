@@ -1,22 +1,9 @@
-/*
- * @(#)Constants.java Aug 14, 2004
- *
- * Copyright (c)2004 FlipSwap, Inc.
- * U.S.A. All Rights Reserved.
- *
- * This software is the confidential and proprietary information of FlipSwap, Inc.
- * ("Confidential Information"). You shall not disclose such
- * Confidential Information and shall use it only in accordance with the terms
- * of the license agreement you entered into with FlipSwap, Inc.
- */
+
 package com.spring.util;
 
 import java.math.BigDecimal;
 
-/**
- * @author Andrew Berman
- * @version $Id: Constants.java 14385 2011-10-22 10:43:42Z akaur $
- */
+
 public final class Constants {
 	private Constants() {
 		// Can't construct this
