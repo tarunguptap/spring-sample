@@ -29,10 +29,6 @@ import com.spring.exception.FatalApplicationException;
 import com.spring.service.EmailService;
 import com.spring.service.SubService;
 
-/**
- * @author tgupta
- * 
- */
 public class UserExecutionListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserExecutionListener.class);
 
