@@ -29,7 +29,7 @@ public class ConstantDAOImpl extends BaseDAOImpl<Constant, Long> implements Cons
 	/*
      * (non-Javadoc)
      * 
-     * @see com.flipswap.dao.impl.hibernate.ConstantDAO#findConstantByCode(java.lang.String,
+     * @see com.dao.impl.hibernate.ConstantDAO#findConstantByCode(java.lang.String,
      *      java.lang.Class)
      */
     @SuppressWarnings("unchecked")
@@ -45,7 +45,7 @@ public class ConstantDAOImpl extends BaseDAOImpl<Constant, Long> implements Cons
     /*
      * (non-Javadoc)
      * 
-     * @see com.flipswap.dao.impl.hibernate.ConstantDAO#findConstants(java.lang.Class)
+     * @see com.dao.impl.hibernate.ConstantDAO#findConstants(java.lang.Class)
      */
     public <T extends Constant> List<T> findConstants(Class<T> codeTypeClass)
             throws DataAccessException {
