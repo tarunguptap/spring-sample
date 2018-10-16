@@ -14,10 +14,6 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.ServletRequestUtils;
 
 
-/**
- * @author tgupta
- * 
- */
 @Component
 public class ModSubValidator {
 	
